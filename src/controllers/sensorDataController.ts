@@ -1,36 +1,126 @@
 import { EventEmitter2 } from "eventemitter2";
-import { getManager, Repository } from "typeorm";
 import { SensorData } from "../entity";
+import { getRepository } from "typeorm";
+import { Request, Response } from "express";
+import { validate } from "class-validator";
+import { logger } from "../utils";
 
 export class SensorDataController {
     private readonly emitter = new EventEmitter2();
-    private readonly repository: Repository<SensorData>;
 
-    constructor() {
-        this.repository = getManager().getRepository(SensorData);
+    async getSensorDatas(_: Request, res: Response) {
+        try {
+            const sensorDataRepository = getRepository(SensorData);
+            const sensorDatas = await sensorDataRepository.find();
+
+            res.send(sensorDatas);
+        } catch (error) {
+            logger.log("error", `API Error:`);
+            logger.log("error", error);
+            res.status(500).json({ error });
+        }
     }
 
-    getSensorData(): Promise<SensorData[]> {
-        return this.repository.find();
+    async getSensorData(req: Request, res: Response) {
+        try {
+            const id = parseInt(req.params.id);
+            const sensorDataRepository = getRepository(SensorData);
+            const sensorData = await sensorDataRepository.findOneOrFail(id);
+            res.send(sensorData);
+        } catch (error) {
+            logger.log("error", `API Error:`);
+            logger.log("error", error);
+            res.status(404).send("Sensor not found");
+        }
     }
 
-    getDeviceSensorData(id: number): Promise<SensorData | undefined> {
-        return this.repository.findOne(id);
+    async createSensorData(req: Request, res: Response) {
+        const {
+            sensor, sensorValue
+        } = req.body;
+
+        if (!name) {
+            return res.status(400)
+            .send({ error: "Missing data: sensor or sensorValue" });
+        }
+
+        const sensorData = new SensorData();
+        sensorData.sensor = sensor;
+        sensorData.sensorValue = sensorValue;
+
+        const errors = await validate(sensorData);
+        if (errors.length > 0) {
+            res.status(400).send(errors);
+            return;
+        }
+
+        try {
+            const sensorDataRepository = getRepository(SensorData);
+            await sensorDataRepository.save(sensorData);
+        } catch (e) {
+            res.status(409).send("Invalid sensor data");
+            return;
+        }
+
+        res.status(201).send(sensorData);
     }
 
-    createSensorData(sensorData: SensorData): Promise<SensorData> {
-        const newSensorData = this.repository.create(sensorData);
-        return this.repository.save(newSensorData);
+    async updateSensorData(req: Request, res: Response) {
+        const id = parseInt(req.params.id);
+        const {
+            sensor, sensorValue
+        } = req.body;
+
+        if (!name) {
+            return res.status(400)
+                .send({ error: "Missing data: sensor or sensorValue" });
+        }
+
+        let sensorData;
+        const sensorDataRepository = getRepository(SensorData);
+        try {
+            sensorData = await sensorDataRepository.findOneOrFail(id);
+        } catch (error) {
+            logger.log("error", `API Error:`);
+            logger.log("error", error);
+            res.status(404).send("Sensor not found");
+            return;
+        }
+
+        sensorData.sensor = sensor;
+        sensorData.sensorValue = sensorValue;
+
+        const errors = await validate(sensorData);
+        if (errors.length > 0) {
+            res.status(400).send(errors);
+            return;
+        }
+
+        try {
+            await sensorDataRepository.save(sensorData);
+        } catch (e) {
+            res.status(409).send("Invalid sensor data");
+            return;
+        }
+
+        res.status(200).send(sensorData);
     }
 
-    async updateSensorData(sensorData: SensorData, id: number): Promise<SensorData | undefined> {
-        await this.repository.update(id, sensorData);
-        return this.repository.findOne(id);
-    }
+    async deleteSensorData(req: Request, res: Response) {
+        const id = parseInt(req.params.id);
 
-    async deleteSensorData(id: number): Promise<boolean> {
-        const deleted = await this.repository.delete(id);
-        return deleted.raw[1] ? true : false;
+        const sensorDataRepository = getRepository(SensorData);
+        try {
+            await sensorDataRepository.findOneOrFail(id);
+        } catch (error) {
+            logger.log("error", `API Error:`);
+            logger.log("error", error);
+            res.status(404).send("Sensor not found");
+            return;
+        }
+        sensorDataRepository.delete(id);
+
+        res.status(200).send(true);
     }
 
     on(event: "Error", cb: (error: Error) => void): this;

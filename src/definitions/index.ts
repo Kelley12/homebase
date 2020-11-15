@@ -1,2 +1,2 @@
 export * from "./intefaces";
-export * from "./ormconfig";
+export * from "./config";

@@ -34,7 +34,7 @@ Meant to be used as a server for Raspberry Pi's and Arduino's to communicate wit
 
 - [Node.js](https://nodejs.org/en/)
 - [Express.js](https://expressjs.com/)
-- [PostgreSQL](https://www.postgresql.org/)
+- [MySQL](https://www.mysql.com/)
 
 ### Testing
 
@@ -50,7 +50,7 @@ Meant to be used as a server for Raspberry Pi's and Arduino's to communicate wit
 
 - [Node and NPM](https://nodejs.org/en/download/)
 - [Docker and Docker Compose](https://docs.docker.com/install/)
-- [PostgreSQL](https://www.postgresql.org/download/)
+- [MySQL](https://www.mysql.com/downloads/)
 
 ### Validate Installations
 
@@ -72,20 +72,13 @@ docker-compose -v
 
 ### Docker
 
-Update the [docker-compose.yml](/docker-compose.yml) file, set the `volumes` values to an existing local location.
-
-```bash
-    volumes:
-    - /data/postgres:/existing/folder/location
-```
-
 Spin up the Docker container using the following command:
 
 ```bash
 docker-compose up
 ```
 
-[For more info on developing with Docker, PostgreSQL, and pgAdmin](./docs/docker-pgAdmin.md).
+[For more info on developing with Docker, MySQL, and PHPMyAdmin](./docs/docker-mysql-phpMyAdmin.md).
 
 ### App
 
@@ -100,4 +93,10 @@ npm install
 
 # Run Development
 npm run dev
+```
+
+Or all in one command
+
+```bash
+cp .env.example .env && npm i && npm run dev
 ```

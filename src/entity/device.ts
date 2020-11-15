@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { IDevice } from "../definitions";
 
-@Entity()
+@Entity("device")
 export class Device implements IDevice {
     @PrimaryGeneratedColumn()
     public deviceId?: number;

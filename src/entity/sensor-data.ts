@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "ty
 import { Sensor } from "./sensor";
 import { Device } from "./device";
 
-@Entity()
+@Entity("sensorData")
 export class SensorData {
     @PrimaryGeneratedColumn()
     public sensorDataId?: number;

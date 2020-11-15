@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity("sensor")
 export class Sensor {
     @PrimaryGeneratedColumn()
     public sensorId?: number;

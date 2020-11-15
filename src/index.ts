@@ -1,6 +1,6 @@
 import { Server } from "./server";
 import { logger } from "./utils";
-import { connectionConfig } from "./definitions";
+import { dbconfig } from "./definitions";
 import dotenv from "dotenv";
 
 logger.log("info", "Loading .env");
@@ -10,7 +10,7 @@ logger.log("info", "Initializing server");
 const server = new Server();
 logger.registerEmitter(server, { name: "Server", level: "verbose" });
 
-server.connect(connectionConfig())
+server.connect(dbconfig)
     .then(() => {
         const PORT = Number(process.env.PORT) || 9000;
         server.listen("0.0.0.0", PORT);
